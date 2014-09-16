@@ -83,7 +83,7 @@ public class PushPlugin extends CordovaPlugin {
                     try {
                         JSONObject jo = data.getJSONObject(0);
                         gECB = (String) jo.get("ecb");
-                        gSenderId = (String) jo.get("senderID");
+                        gSenderID = (String) jo.get("senderID");
                         result = true;
                         callbackContext.success();
                     } catch (JSONException e) {
