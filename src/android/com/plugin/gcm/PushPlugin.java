@@ -23,6 +23,7 @@ public class PushPlugin extends CordovaPlugin {
 	public static final String TAG = "PushPlugin";
 
 	public static final String REGISTER = "register";
+	public static final String SETECB = "setecb";
 	public static final String UNREGISTER = "unregister";
 	public static final String EXIT = "exit";
 
@@ -77,7 +78,20 @@ public class PushPlugin extends CordovaPlugin {
 				gCachedExtras = null;
 			}
 
-		} else if (UNREGISTER.equals(action)) {
+		} else if (SETECB.equals(action)) {
+                    Log.v(TAG, "setecb: data=" + data.toString());
+                    try {
+                        JSONObject jo = data.getJSONObject(0);
+                        gECB = (String) jo.get("ecb");
+                        gSenderId = (String) jo.get("senderID");
+                        result = true;
+                        callbackContext.success();
+                    } catch (JSONException e) {
+                        Log.e(TAG, "setectb: Got JSON Exception " + e.getMessage());
+                        result = false;
+                        callbackContext.error(e.GetMessage());
+                    }
+                } else if (UNREGISTER.equals(action)) {
 
 			GCMRegistrar.unregister(getApplicationContext());
 
