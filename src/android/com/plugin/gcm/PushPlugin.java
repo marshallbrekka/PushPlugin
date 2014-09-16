@@ -89,7 +89,7 @@ public class PushPlugin extends CordovaPlugin {
                     } catch (JSONException e) {
                         Log.e(TAG, "setectb: Got JSON Exception " + e.getMessage());
                         result = false;
-                        callbackContext.error(e.GetMessage());
+                        callbackContext.error(e.getMessage());
                     }
                 } else if (UNREGISTER.equals(action)) {
 
