@@ -53,6 +53,7 @@
     id badgeArg = [options objectForKey:@"badge"];
     id soundArg = [options objectForKey:@"sound"];
     id alertArg = [options objectForKey:@"alert"];
+    id doRegister = [options objectForKey:@"doRegister"];
     
     if ([badgeArg isKindOfClass:[NSString class]])
     {
@@ -85,10 +86,14 @@
 
     isInline = NO;
 
-    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
+    if (![doRegister isEqualToString:@"false"]) {
+
+        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
+
+    }
 	
-	if (notificationMessage)			// if there is a pending startup notification
-		[self notificationReceived];	// go ahead and process it
+    if (notificationMessage)			// if there is a pending startup notification
+        [self notificationReceived];	// go ahead and process it
 }
 
 /*
