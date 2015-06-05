@@ -257,7 +257,7 @@
     int badge = [[options objectForKey:@"badge"] intValue] ?: 0;
 
     [[UIApplication sharedApplication] setApplicationIconBadgeNumber:badge];
-w
+
     [self successWithMessage:[NSString stringWithFormat:@"app badge count set to %d", badge]];
 }
 -(void)successWithMessage:(NSString *)message
