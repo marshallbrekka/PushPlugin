@@ -37,106 +37,99 @@
 
 - (void)unregister:(CDVInvokedUrlCommand*)command;
 {
-	self.callbackId = command.callbackId;
+  self.callbackId = command.callbackId;
 
-    [[UIApplication sharedApplication] unregisterForRemoteNotifications];
-    [self successWithMessage:@"unregistered"];
+  [[UIApplication sharedApplication] unregisterForRemoteNotifications];
+  [self successWithMessage:@"unregistered"];
 }
 
 - (void)register:(CDVInvokedUrlCommand*)command;
 {
-	self.callbackId = command.callbackId;
+  self.callbackId = command.callbackId;
 
-    NSMutableDictionary* options = [command.arguments objectAtIndex:0];
+  NSMutableDictionary* options = [command.arguments objectAtIndex:0];
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-		UIUserNotificationType UserNotificationTypes = UIUserNotificationTypeNone;
+  UIUserNotificationType UserNotificationTypes = UIUserNotificationTypeNone;
 #endif
-    UIRemoteNotificationType notificationTypes = UIRemoteNotificationTypeNone;
+  UIRemoteNotificationType notificationTypes = UIRemoteNotificationTypeNone;
 
-    id badgeArg = [options objectForKey:@"badge"];
-    id soundArg = [options objectForKey:@"sound"];
-    id alertArg = [options objectForKey:@"alert"];
-    // originally added in the fork by bwo, but causes problems
-    //id doRegister = [options objectForKey:@"doRegister"];
+  id badgeArg = [options objectForKey:@"badge"];
+  id soundArg = [options objectForKey:@"sound"];
+  id alertArg = [options objectForKey:@"alert"];
+  // originally added in the fork by bwo, but causes problems
+  //id doRegister = [options objectForKey:@"doRegister"];
 
-    if ([badgeArg isKindOfClass:[NSString class]])
-    {
-        if ([badgeArg isEqualToString:@"true"]) {
-            notificationTypes |= UIRemoteNotificationTypeBadge;
+  if ([badgeArg isKindOfClass:[NSString class]]) {
+    if ([badgeArg isEqualToString:@"true"]) {
+      notificationTypes |= UIRemoteNotificationTypeBadge;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-            UserNotificationTypes |= UIUserNotificationTypeBadge;
-#endif
-        }
-    }
-    else if ([badgeArg boolValue]) {
-        notificationTypes |= UIRemoteNotificationTypeBadge;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-        UserNotificationTypes |= UIUserNotificationTypeBadge;
+      UserNotificationTypes |= UIUserNotificationTypeBadge;
 #endif
     }
-
-    if ([soundArg isKindOfClass:[NSString class]])
-    {
-        if ([soundArg isEqualToString:@"true"]) {
-            notificationTypes |= UIRemoteNotificationTypeSound;
+  } else if ([badgeArg boolValue]) {
+    notificationTypes |= UIRemoteNotificationTypeBadge;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-            UserNotificationTypes |= UIUserNotificationTypeSound;
+    UserNotificationTypes |= UIUserNotificationTypeBadge;
+#endif
+  }
+  if ([soundArg isKindOfClass:[NSString class]]) {
+    if ([soundArg isEqualToString:@"true"]) {
+      notificationTypes |= UIRemoteNotificationTypeSound;
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+      UserNotificationTypes |= UIUserNotificationTypeSound;
 #endif
     }
-    }
-    else if ([soundArg boolValue]) {
-        notificationTypes |= UIRemoteNotificationTypeSound;
+  } else if ([soundArg boolValue]) {
+    notificationTypes |= UIRemoteNotificationTypeSound;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-        UserNotificationTypes |= UIUserNotificationTypeSound;
+    UserNotificationTypes |= UIUserNotificationTypeSound;
+#endif
+  }
+
+  if ([alertArg isKindOfClass:[NSString class]]) {
+    if ([alertArg isEqualToString:@"true"]) {
+      notificationTypes |= UIRemoteNotificationTypeAlert;
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+      UserNotificationTypes |= UIUserNotificationTypeAlert;
 #endif
     }
-
-    if ([alertArg isKindOfClass:[NSString class]])
-    {
-        if ([alertArg isEqualToString:@"true"]) {
-            notificationTypes |= UIRemoteNotificationTypeAlert;
+  } else if ([alertArg boolValue]) {
+    notificationTypes |= UIRemoteNotificationTypeAlert;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-            UserNotificationTypes |= UIUserNotificationTypeAlert;
+    UserNotificationTypes |= UIUserNotificationTypeAlert;
 #endif
-    }
-    }
-    else if ([alertArg boolValue]) {
-        notificationTypes |= UIRemoteNotificationTypeAlert;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-        UserNotificationTypes |= UIUserNotificationTypeAlert;
-#endif
-    }
+  }
 
-    notificationTypes |= UIRemoteNotificationTypeNewsstandContentAvailability;
+  notificationTypes |= UIRemoteNotificationTypeNewsstandContentAvailability;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-    UserNotificationTypes |= UIUserNotificationActivationModeBackground;
+  UserNotificationTypes |= UIUserNotificationActivationModeBackground;
 #endif
 
-    self.callback = [options objectForKey:@"ecb"];
+  self.callback = [options objectForKey:@"ecb"];
 
-    if (notificationTypes == UIRemoteNotificationTypeNone)
-        NSLog(@"PushPlugin.register: Push notification type is set to none");
+  if (notificationTypes == UIRemoteNotificationTypeNone)
+    NSLog(@"PushPlugin.register: Push notification type is set to none");
 
-    isInline = NO;
+  isInline = NO;
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
-    if ([[UIApplication sharedApplication]respondsToSelector:@selector(registerUserNotificationSettings:)]) {
-        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UserNotificationTypes categories:nil];
-        [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
-    } else {
-      [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
-    }
-#else
+  if ([[UIApplication sharedApplication]respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:UserNotificationTypes categories:nil];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+    [[UIApplication sharedApplication] registerForRemoteNotifications];
+  } else {
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
+  }
+#else
+  [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
 #endif
 
-    // if there is a pending startup notification
-    if (notificationMessage) {
-      // go ahead and process it
-      [self notificationReceived];
-    }
+  // if there is a pending startup notification
+  if (notificationMessage) {
+    // go ahead and process it
+    [self notificationReceived];
+  }
 }
 
 /*
@@ -151,8 +144,8 @@
 
     NSMutableDictionary *results = [NSMutableDictionary dictionary];
     NSString *token = [[[[deviceToken description] stringByReplacingOccurrencesOfString:@"<"withString:@""]
-                        stringByReplacingOccurrencesOfString:@">" withString:@""]
-                       stringByReplacingOccurrencesOfString: @" " withString: @""];
+                         stringByReplacingOccurrencesOfString:@">" withString:@""]
+                        stringByReplacingOccurrencesOfString: @" " withString: @""];
     [results setValue:token forKey:@"deviceToken"];
 
     #if !TARGET_IPHONE_SIMULATOR
@@ -160,27 +153,29 @@
         [results setValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"] forKey:@"appName"];
         [results setValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] forKey:@"appVersion"];
 
+        // I don't need this in the app, and it doesn't work on ios >= 8. So
+        // skip it for now.
         // Check what Notifications the user has turned on.  We registered for all three, but they may have manually disabled some or all of them.
-        NSUInteger rntypes = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
+        // NSUInteger rntypes = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
 
         // Set the defaults to disabled unless we find otherwise...
         NSString *pushBadge = @"disabled";
         NSString *pushAlert = @"disabled";
         NSString *pushSound = @"disabled";
 
-        // Check what Registered Types are turned on. This is a bit tricky since if two are enabled, and one is off, it will return a number 2... not telling you which
-        // one is actually disabled. So we are literally checking to see if rnTypes matches what is turned on, instead of by number. The "tricky" part is that the
-        // single notification types will only match if they are the ONLY one enabled.  Likewise, when we are checking for a pair of notifications, it will only be
-        // true if those two notifications are on.  This is why the code is written this way
-        if(rntypes & UIRemoteNotificationTypeBadge){
-            pushBadge = @"enabled";
-        }
-        if(rntypes & UIRemoteNotificationTypeAlert) {
-            pushAlert = @"enabled";
-        }
-        if(rntypes & UIRemoteNotificationTypeSound) {
-            pushSound = @"enabled";
-        }
+        // // Check what Registered Types are turned on. This is a bit tricky since if two are enabled, and one is off, it will return a number 2... not telling you which
+        // // one is actually disabled. So we are literally checking to see if rnTypes matches what is turned on, instead of by number. The "tricky" part is that the
+        // // single notification types will only match if they are the ONLY one enabled.  Likewise, when we are checking for a pair of notifications, it will only be
+        // // true if those two notifications are on.  This is why the code is written this way
+        // if (rntypes & UIRemoteNotificationTypeBadge) {
+        //     pushBadge = @"enabled";
+        // }
+        // if (rntypes & UIRemoteNotificationTypeAlert) {
+        //     pushAlert = @"enabled";
+        // }
+        // if (rntypes & UIRemoteNotificationTypeSound) {
+        //     pushSound = @"enabled";
+        // }
 
         [results setValue:pushBadge forKey:@"pushBadge"];
         [results setValue:pushAlert forKey:@"pushAlert"];
@@ -192,7 +187,7 @@
         [results setValue:dev.model forKey:@"deviceModel"];
         [results setValue:dev.systemVersion forKey:@"deviceSystemVersion"];
 
-		[self successWithMessage:[NSString stringWithFormat:@"%@", token]];
+        [self successWithMessage:[NSString stringWithFormat:@"%@", token]];
     #endif
 }
 
